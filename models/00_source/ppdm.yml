@@ -1,0 +1,13 @@
+version: 2
+
+sources:
+  - name: ppdm
+    database: PPDM_SOURCE
+    schema: RAW
+
+    tables:
+      - name: well
+        identifier: WELL
+
+      - name: well_status
+        identifier: WELL_STATUS
