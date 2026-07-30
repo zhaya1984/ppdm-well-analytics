@@ -1,0 +1,23 @@
+version: 2
+
+models:
+  - name: well_current_status
+    description: >
+      Current well status model containing one current status row per well.
+
+    columns:
+      - name: well_id
+        description: Unique business identifier for a well.
+        tests:
+          - not_null
+          - unique
+          - relationships:
+              arguments:
+                to: ref('dim_well')
+                field: well_id
+
+      - name: well_status_id
+        description: Unique identifier of the current well status record.
+        tests:
+          - not_null
+          - unique
