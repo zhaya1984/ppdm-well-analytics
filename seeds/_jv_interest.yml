@@ -1,0 +1,16 @@
+version: 2
+
+seeds:
+  - name: jv_interest
+    description: >
+      Reference mapping between JV contract names and Santos interest percentages.
+
+    columns:
+      - name: jv_contract_name
+        description: Unique name of the JV contract.
+        tests:
+          - not_null
+          - unique
+
+      - name: santos_interest_pct
+        description: Santos ownership interest percentage for the JV contract.
