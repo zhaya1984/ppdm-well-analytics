@@ -3,7 +3,10 @@ version: 2
 models:
   - name: well_current_status
     description: >
-      Current well status model containing one current status row per well.
+      Current-state well classification model containing one row per well.
+      Legacy classification fields are retained for backward compatibility,
+      while the multidimensional classification facets represent the target
+      classification structure.
 
     columns:
       - name: well_id
@@ -21,3 +24,39 @@ models:
         tests:
           - not_null
           - unique
+
+      - name: current_class
+        description: Legacy current well classification retained for backward compatibility.
+
+      - name: current_status
+        description: Legacy current well status retained for backward compatibility.
+
+      - name: well_intent
+        description: Legacy well intent retained for backward compatibility.
+
+      - name: lifecycle
+        description: Target lifecycle classification facet.
+
+      - name: business_intention
+        description: Target business intention classification facet.
+
+      - name: outcome
+        description: Target outcome classification facet, where applicable.
+
+      - name: play_type
+        description: Target play type classification facet.
+
+      - name: well_role
+        description: Target well role classification facet.
+
+      - name: well_condition
+        description: Target current condition classification facet.
+
+      - name: product_type
+        description: Target product type classification facet, where applicable.
+
+      - name: product_significance
+        description: Target product significance classification facet, where applicable.
+
+      - name: status_source_last_updated_at
+        description: Timestamp when the source well status record was last updated.

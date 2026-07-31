@@ -10,9 +10,13 @@ final as (
     select
         well_id,
         well_status_id,
+
+        -- Legacy well classification
         current_class,
         current_status,
         well_intent,
+
+        -- Target multidimensional classification
         lifecycle,
         business_intention,
         outcome,
@@ -21,6 +25,7 @@ final as (
         well_condition,
         product_type,
         product_significance,
+
         status_source_last_updated_at
 
     from well_enriched
