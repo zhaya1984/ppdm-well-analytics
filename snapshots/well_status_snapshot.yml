@@ -1,0 +1,15 @@
+version: 2
+
+snapshots:
+  - name: snap_well_status
+    description: >
+      Historical snapshot of the mutable PPDM well status source.
+      Each well is versioned when LAST_UPDATED_AT changes.
+
+    relation: source('ppdm', 'well_status')
+
+    config:
+      schema: snapshots
+      unique_key: UWI
+      strategy: timestamp
+      updated_at: LAST_UPDATED_AT
