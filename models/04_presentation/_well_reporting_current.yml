@@ -1,0 +1,87 @@
+version: 2
+
+models:
+  - name: well_reporting_current
+    description: >
+      Current-state reporting dataset containing one row per well.
+      It combines stable well attributes from dim_well with the latest
+      available well classification from well_current_status.
+      Records are retained even when some status attributes are temporarily
+      incomplete, allowing downstream reporting tools to surface data quality
+      issues without excluding the well.
+
+    columns:
+      - name: well_id
+        description: Unique business identifier for the well.
+        tests:
+          - not_null
+          - unique
+
+      - name: well_name
+        description: Business name of the well.
+
+      - name: country
+        description: Country in which the well is located.
+
+      - name: state_province
+        description: State or province associated with the well.
+
+      - name: basin
+        description: Geological basin associated with the well.
+
+      - name: well_profile
+        description: Profile or trajectory classification of the well.
+
+      - name: business_unit_code
+        description: Business unit responsible for the well.
+
+      - name: jv_contract_name
+        description: Joint venture contract associated with the well.
+
+      - name: santos_interest_pct
+        description: Santos ownership interest percentage derived from the JV mapping.
+
+      - name: jv_mapping_status
+        description: Indicates whether the JV contract was successfully mapped to an ownership interest.
+
+      - name: well_status_id
+        description: Identifier of the latest available well status record, where present.
+
+      - name: current_class
+        description: Legacy current well classification.
+
+      - name: current_status
+        description: Legacy current well status.
+
+      - name: well_intent
+        description: Legacy well intent classification.
+
+      - name: lifecycle
+        description: Current lifecycle classification facet.
+
+      - name: business_intention
+        description: Current business intention classification facet.
+
+      - name: outcome
+        description: Current outcome classification facet, where applicable.
+
+      - name: play_type
+        description: Current play type classification facet.
+
+      - name: well_role
+        description: Current well role classification facet.
+
+      - name: well_condition
+        description: Current well condition classification facet.
+
+      - name: product_type
+        description: Current product type classification, where available.
+
+      - name: product_significance
+        description: Current product significance classification, where applicable.
+
+      - name: well_source_last_updated_at
+        description: Last update timestamp supplied by the well source record.
+
+      - name: status_source_last_updated_at
+        description: Last update timestamp supplied by the current status source record.
