@@ -1,28 +1,37 @@
-with well_enriched as (
+with wells as (
 
     select *
-    from {{ ref('int_well_enriched') }}
+    from {{ ref('stg_ppdm__well') }}
 
 ),
 
-final as (
+jv_interest_mapping as (
 
-    select
-        well_id,
-        well_name,
-        country,
-        state_province,
-        basin,
-        well_profile,
-        business_unit_code,
-        jv_contract_name,
-        santos_interest_pct,
-        jv_mapping_status,
-        well_source_last_updated_at
-
-    from well_enriched
+    select *
+    from {{ ref('jv_interest') }}
 
 )
 
-select *
-from final
+select
+    w.well_id,
+    w.well_name,
+    w.country,
+    w.state_province,
+    w.basin,
+    w.well_profile,
+    w.business_unit_code,
+    w.jv_contract_name,
+
+    j.santos_interest_pct,
+
+    case
+        when j.jv_contract_name is not null then 'MAPPED'
+        else 'UNMAPPED'
+    end as jv_mapping_status,
+
+    w.source_last_updated_at as well_source_last_updated_at
+
+from wells w
+
+left join jv_interest_mapping j
+    on w.jv_contract_name = j.jv_contract_name
