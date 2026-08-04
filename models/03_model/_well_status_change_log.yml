@@ -1,0 +1,79 @@
+version: 2
+
+models:
+  - name: well_status_change_log
+    description: >
+      Field-level change log derived from well_status_history.
+      Each row represents one monitored well status field changing
+      between two consecutive observed status versions.
+
+    columns:
+      - name: well_id
+        description: Unique identifier of the well.
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_well')
+                field: well_id
+
+      - name: status_version_id
+        description: >
+          Unique technical identifier of the new status version
+          in which the change was observed.
+        tests:
+          - not_null
+
+      - name: previous_status_version_id
+        description: >
+          Technical identifier of the immediately preceding
+          status version used for comparison.
+        tests:
+          - not_null
+
+      - name: well_status_id
+        description: Source-system identifier of the well status record.
+        tests:
+          - not_null
+
+      - name: changed_at
+        description: >
+          Timestamp from which the new status version became effective.
+        tests:
+          - not_null
+
+      - name: changed_field
+        description: Name of the monitored field that changed.
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values:
+                  - lifecycle
+                  - business_intention
+                  - outcome
+                  - play_type
+                  - well_role
+                  - well_condition
+                  - product_type
+                  - product_significance
+
+      - name: old_value
+        description: Value of the field in the previous status version.
+
+      - name: new_value
+        description: Value of the field in the new status version.
+
+      - name: change_type
+        description: >
+          Classification of the observed field change, distinguishing
+          business value changes from formatting-only changes and null transitions.
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values:
+                  - VALUE_CHANGE
+                  - FORMAT_ONLY_CHANGE
+                  - VALUE_POPULATED
+                  - VALUE_CLEARED
