@@ -39,9 +39,6 @@ models:
       +schema: stage
       +materialized: view
 
-    02_transform:
-      +schema: transform
-      +materialized: view
 
     03_model:
       +schema: model

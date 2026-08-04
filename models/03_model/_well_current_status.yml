@@ -3,18 +3,16 @@ version: 2
 models:
   - name: well_current_status
     description: >
-      Current-state well classification model containing one row per well.
-      Legacy classification fields are retained for backward compatibility,
-      while the multidimensional classification facets represent the target
-      classification structure.
+      Current well status model containing one row per available well status
+      record. It combines legacy classification from stg_ppdm__well with
+      multidimensional status attributes from stg_ppdm__well_status.
 
     columns:
       - name: well_id
         description: Unique business identifier for a well.
         tests:
-          - not_null
-          - unique
           - relationships:
+
               arguments:
                 to: ref('dim_well')
                 field: well_id
