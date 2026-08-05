@@ -1,0 +1,69 @@
+version: 2
+
+models:
+  - name: stg_ppdm__well_status_native
+    description: >
+      Standardised source-native well status history.
+      Each row represents one source status record for a well,
+      status type and effective period.
+
+    columns:
+      - name: status_id
+        description: Unique source-native identifier of the status record.
+        tests:
+          - not_null
+          - unique
+
+      - name: well_id
+        description: Identifier of the well associated with the status record.
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_ppdm__well')
+                field: well_id
+
+      - name: source_system
+        description: Source system that supplied the status record.
+        tests:
+          - not_null
+
+      - name: status_type
+        description: Standardised status facet represented by the row.
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values:
+                  - LIFECYCLE
+                  - CONDITION
+                  - PRODUCT_TYPE
+
+      - name: status_value
+        description: Status value as recorded by the source system.
+        tests:
+          - not_null
+
+      - name: effective_date
+        description: Business date from which the status became effective.
+        tests:
+          - not_null
+
+      - name: expiry_date
+        description: >
+          Business date on which the status ceased to be effective.
+          Null indicates an open-ended record.
+
+      - name: active_ind
+        description: Source indicator showing whether the record is active.
+        tests:
+          - accepted_values:
+              arguments:
+                values:
+                  - Y
+                  - N
+
+      - name: row_changed_at
+        description: Timestamp when the source record was last changed.
+        tests:
+          - not_null
