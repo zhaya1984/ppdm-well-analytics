@@ -1,0 +1,57 @@
+version: 2
+
+models:
+  - name: int_well_status_current_resolved
+    description: >
+      Resolved current source-native well status records.
+      Each row represents the selected current status value for one well
+      and status type, based on business effective dates.
+
+    columns:
+      - name: status_id
+        description: Identifier of the selected source-native status record.
+        tests:
+          - not_null
+          - unique
+
+      - name: well_id
+        description: Identifier of the well.
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_ppdm__well')
+                field: well_id
+
+      - name: status_type
+        description: Status facet represented by the record.
+        tests:
+          - not_null
+
+      - name: status_value
+        description: Selected current source-native status value.
+        tests:
+          - not_null
+
+      - name: effective_date
+        description: Business date from which the status became effective.
+        tests:
+          - not_null
+
+      - name: current_record_count
+        description: >
+          Number of effective records found for the same well and status type.
+        tests:
+          - not_null
+
+      - name: current_resolution_status
+        description: >
+          Indicates whether one unambiguous current record was found or
+          whether multiple current records required deterministic selection.
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values:
+                  - RESOLVED
+                  - MULTIPLE_CURRENT_RECORDS

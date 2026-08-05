@@ -1,0 +1,88 @@
+version: 2
+
+models:
+  - name: int_ppdm__well_status_native
+    description: >
+      Source-native well lifecycle history extracted from the broader
+      PPDM well status dataset. Each row represents one lifecycle status
+      record for one well and one business-effective period. Other status
+      types remain available in the staging model but are outside the
+      scope of this intermediate model.
+
+    columns:
+      - name: status_id
+        description: >
+          Unique source-native identifier of the lifecycle status record.
+        tests:
+          - not_null
+          - unique
+
+      - name: well_id
+        description: >
+          Identifier of the well associated with the lifecycle record.
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_ppdm__well')
+                field: well_id
+
+      - name: source_system
+        description: >
+          Source system that supplied the lifecycle record.
+        tests:
+          - not_null
+
+      - name: lifecycle
+        description: >
+          Lifecycle value recorded by the source system. Original casing
+          is retained to support later comparison of business value changes
+          and formatting-only changes.
+        tests:
+          - not_null
+
+      - name: effective_date
+        description: >
+          Business date from which the lifecycle status became effective.
+        tests:
+          - not_null
+
+      - name: expiry_date
+        description: >
+          Business date on which the lifecycle status ceased to be
+          effective. A null value represents an open-ended period.
+
+      - name: active_ind
+        description: >
+          Source-system active indicator retained for reconciliation with
+          the business-effective date range.
+        tests:
+          - accepted_values:
+              arguments:
+                values:
+                  - Y
+                  - N
+
+      - name: remark
+        description: >
+          Free-text source remark associated with the lifecycle record.
+
+      - name: row_created_by
+        description: >
+          Source-system user or process that created the record.
+
+      - name: row_created_at
+        description: >
+          Timestamp when the source record was created.
+        tests:
+          - not_null
+
+      - name: row_changed_by
+        description: >
+          Source-system user or process that most recently changed the record.
+
+      - name: row_changed_at
+        description: >
+          Timestamp when the source record was most recently changed.
+        tests:
+          - not_null

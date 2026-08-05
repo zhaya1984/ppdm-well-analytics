@@ -11,5 +11,37 @@ sources:
 
       - name: well_status
         identifier: WELL_STATUS
+ 
+      - name: well_status_native
+        description: >
+          Source-native PPDM-style well status history.
+          Each row represents one status value for a well, status type,
+          source and effective period.
 
+        columns:
+          - name: status_id
+            description: Source-native identifier of the status record.
+            tests:
+              - not_null
+              - unique
+
+          - name: uwi
+            description: Identifier of the well associated with the status record.
+            tests:
+              - not_null
+
+          - name: status_type
+            description: Status facet represented by the row.
+            tests:
+              - not_null
+
+          - name: status
+            description: Status value recorded for the status type.
+            tests:
+              - not_null
+
+          - name: effective_date
+            description: Business date from which the status became effective.
+            tests:
+              - not_null
 

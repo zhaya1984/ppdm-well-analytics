@@ -1,5 +1,5 @@
 select *
-from {{ ref('int_well_enriched') }}
+from {{ ref('dim_well') }}
 where
     (
         jv_mapping_status = 'MAPPED'
