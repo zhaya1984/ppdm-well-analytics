@@ -1,0 +1,61 @@
+version: 2
+
+models:
+  - name: well_lifecycle_history_snapshot
+    description: >
+      Snapshot-derived well lifecycle history reconstructed from the broader
+      SCD2 well status history. Each row represents one snapshot-observed
+      lifecycle period for a well. Consecutive SCD2 versions with the same
+      lifecycle are collapsed into a single lifecycle period.
+
+    columns:
+      - name: well_id
+        description: >
+          Identifier of the well associated with the lifecycle period.
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_ppdm__well')
+                field: well_id
+
+      - name: lifecycle
+        description: >
+          Lifecycle value observed in the snapshot-derived history.
+          Source casing is retained for downstream reconciliation.
+        tests:
+          - not_null
+
+      - name: snapshot_valid_from
+        description: >
+          Start timestamp of the snapshot-derived lifecycle period.
+          Derived from the first SCD2 version in which this lifecycle
+          was observed.
+        tests:
+          - not_null
+
+      - name: snapshot_valid_to
+        description: >
+          End timestamp of the snapshot-derived lifecycle period.
+          Derived from the start timestamp of the next observed lifecycle
+          change. A null value represents the latest observed lifecycle.
+
+      - name: is_current
+        description: >
+          Indicates whether the lifecycle period is the latest currently
+          observed snapshot-derived lifecycle for the well.
+        tests:
+          - not_null
+
+      - name: source_last_updated_at
+        description: >
+          Source update timestamp associated with the SCD2 version that
+          started this lifecycle period.
+
+      - name: starting_status_version_id
+        description: >
+          Identifier of the snapshot SCD2 version that initiated the
+          lifecycle period.
+        tests:
+          - not_null
+          - unique
