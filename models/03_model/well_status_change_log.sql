@@ -212,4 +212,4 @@ classified_changes as (
 
 
 select *
-from change_log
+from classified_changes
