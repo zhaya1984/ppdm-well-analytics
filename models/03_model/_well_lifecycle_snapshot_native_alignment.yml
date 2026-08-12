@@ -1,0 +1,87 @@
+version: 2
+
+models:
+  - name: well_lifecycle_snapshot_native_alignment
+    description: >
+      Reconciles snapshot-derived lifecycle periods against source-native
+      lifecycle history. Each row represents one snapshot-observed lifecycle
+      period for a well and identifies the source-native lifecycle that was
+      business-effective at the snapshot period start.
+
+    columns:
+      - name: well_id
+        description: >
+          Identifier of the well being reconciled.
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_ppdm__well')
+                field: well_id
+
+      - name: snapshot_lifecycle
+        description: >
+          Lifecycle value observed in the snapshot-derived lifecycle history.
+        tests:
+          - not_null
+
+      - name: snapshot_valid_from
+        description: >
+          Start timestamp of the snapshot-derived lifecycle period.
+        tests:
+          - not_null
+
+      - name: snapshot_valid_to
+        description: >
+          End timestamp of the snapshot-derived lifecycle period.
+          A null value represents the latest observed period.
+
+      - name: snapshot_is_current
+        description: >
+          Indicates whether this is the latest snapshot-derived lifecycle
+          period for the well.
+        tests:
+          - not_null
+
+      - name: starting_status_version_id
+        description: >
+          SCD2 snapshot version that initiated the snapshot lifecycle period.
+        tests:
+          - not_null
+          - unique
+
+      - name: native_status_id
+        description: >
+          Identifier of the source-native lifecycle record that was
+          business-effective when the snapshot lifecycle period began.
+
+      - name: native_lifecycle
+        description: >
+          Source-native lifecycle value effective at the snapshot period start.
+
+      - name: native_effective_date
+        description: >
+          Business-effective start date of the matched native lifecycle record.
+
+      - name: native_expiry_date
+        description: >
+          Business-effective end date of the matched native lifecycle record.
+
+      - name: native_active_ind
+        description: >
+          Source-system active indicator associated with the matched native
+          lifecycle record.
+
+      - name: alignment_status
+        description: >
+          Classification of agreement between the snapshot-observed lifecycle
+          and the source-native lifecycle effective at the same point in time.
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values:
+                  - EXACT_MATCH
+                  - FORMAT_ONLY_MATCH
+                  - VALUE_MISMATCH
+                  - NO_NATIVE_PERIOD
