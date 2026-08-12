@@ -3,23 +3,24 @@
     incremental_strategy='merge',
     unique_key=['status_version_id', 'changed_field']
 ) }}
-
 with affected_wells as (
 
-    select distinct well_id
-    from {{ ref('well_status_history') }}
+select distinct well_id
+from {{ ref('well_status_history') }}
 
-    {% if is_incremental() %}
-
-    where valid_from > (
+{% if is_incremental() %}
+where valid_from > dateadd(
+    day,
+    -7,
+    (
         select coalesce(
             max(changed_at),
             '1900-01-01'::timestamp
         )
         from {{ this }}
     )
-
-    {% endif %}
+)
+{% endif %}
 
 ),
 
