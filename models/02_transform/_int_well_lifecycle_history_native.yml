@@ -1,7 +1,7 @@
 version: 2
 
 models:
-  - name: int_ppdm__well_status_native
+  - name: int_well_lifecycle_history_native
     description: >
       Source-native well lifecycle history extracted from the broader
       PPDM well status dataset. Each row represents one lifecycle status

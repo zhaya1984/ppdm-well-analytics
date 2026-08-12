@@ -1,68 +1,98 @@
-with version_comparison as (
+{{ config(
+    materialized='incremental',
+    incremental_strategy='merge',
+    unique_key=['status_version_id', 'changed_field']
+) }}
+
+with affected_wells as (
+
+    select distinct well_id
+    from {{ ref('well_status_history') }}
+
+    {% if is_incremental() %}
+
+    where valid_from > (
+        select coalesce(
+            max(changed_at),
+            '1900-01-01'::timestamp
+        )
+        from {{ this }}
+    )
+
+    {% endif %}
+
+),
+
+version_comparison as (
+
 
     select
-        well_id,
-        status_version_id,
+        h.well_id,
+        h.status_version_id,
 
-        lag(status_version_id) over (
-            partition by well_id
-            order by valid_from
+        lag(h.status_version_id) over (
+            partition by h.well_id
+            order by h.valid_from
         ) as previous_status_version_id,
 
-        well_status_id,
-        valid_from as changed_at,
+        h.well_status_id,
+        h.valid_from as changed_at,
 
-        lag(lifecycle) over (
-            partition by well_id
-            order by valid_from
+        lag(h.lifecycle) over (
+            partition by h.well_id
+            order by h.valid_from
         ) as previous_lifecycle,
-        lifecycle,
+        h.lifecycle,
 
-        lag(business_intention) over (
-            partition by well_id
-            order by valid_from
+        lag(h.business_intention) over (
+            partition by h.well_id
+            order by h.valid_from
         ) as previous_business_intention,
-        business_intention,
+        h.business_intention,
 
-        lag(outcome) over (
-            partition by well_id
-            order by valid_from
+        lag(h.outcome) over (
+            partition by h.well_id
+            order by h.valid_from
         ) as previous_outcome,
-        outcome,
+        h.outcome,
 
-        lag(play_type) over (
-            partition by well_id
-            order by valid_from
+        lag(h.play_type) over (
+            partition by h.well_id
+            order by h.valid_from
         ) as previous_play_type,
-        play_type,
+        h.play_type,
 
-        lag(well_role) over (
-            partition by well_id
-            order by valid_from
+        lag(h.well_role) over (
+            partition by h.well_id
+            order by h.valid_from
         ) as previous_well_role,
-        well_role,
+        h.well_role,
 
-        lag(well_condition) over (
-            partition by well_id
-            order by valid_from
+        lag(h.well_condition) over (
+            partition by h.well_id
+            order by h.valid_from
         ) as previous_well_condition,
-        well_condition,
+        h.well_condition,
 
-        lag(product_type) over (
-            partition by well_id
-            order by valid_from
+        lag(h.product_type) over (
+            partition by h.well_id
+            order by h.valid_from
         ) as previous_product_type,
-        product_type,
+        h.product_type,
 
-        lag(product_significance) over (
-            partition by well_id
-            order by valid_from
+        lag(h.product_significance) over (
+            partition by h.well_id
+            order by h.valid_from
         ) as previous_product_significance,
-        product_significance,
+        h.product_significance,
 
-        source_last_updated_at
+        h.source_last_updated_at
 
-    from {{ ref('well_status_history') }}
+
+    from {{ ref('well_status_history') }} h
+
+inner join affected_wells a
+    on h.well_id = a.well_id
 
 )
 
@@ -212,4 +242,4 @@ classified_changes as (
 
 
 select *
-from change_log
+from classified_changes

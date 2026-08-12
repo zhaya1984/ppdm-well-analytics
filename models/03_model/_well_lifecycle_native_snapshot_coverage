@@ -1,0 +1,87 @@
+version: 2
+
+models:
+  - name: well_lifecycle_native_snapshot_coverage
+    description: >
+      Evaluates whether each source-native lifecycle period was captured by
+      snapshot-derived lifecycle history. Each row represents one source-native
+      lifecycle period for a well and classifies its coverage relative to the
+      available snapshot observation window.
+
+    columns:
+      - name: native_status_id
+        description: >
+          Unique identifier of the source-native lifecycle record.
+        tests:
+          - not_null
+          - unique
+
+      - name: well_id
+        description: >
+          Identifier of the well associated with the native lifecycle period.
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_ppdm__well')
+                field: well_id
+
+      - name: native_lifecycle
+        description: >
+          Lifecycle value recorded in the source-native history.
+        tests:
+          - not_null
+
+      - name: native_effective_date
+        description: >
+          Business-effective start date of the source-native lifecycle period.
+        tests:
+          - not_null
+
+      - name: native_expiry_date
+        description: >
+          Business-effective end date of the source-native lifecycle period.
+          A null value represents an open-ended period.
+
+      - name: native_active_ind
+        description: >
+          Source-system indicator showing whether the native lifecycle record
+          is currently marked active.
+
+      - name: first_snapshot_observed_at
+        description: >
+          Earliest timestamp at which snapshot-derived lifecycle history exists
+          for the well. Used to distinguish genuine snapshot coverage gaps from
+          native history that predates snapshot observation.
+
+      - name: snapshot_lifecycle
+        description: >
+          Matching snapshot-derived lifecycle value when an overlapping
+          lifecycle period was captured.
+
+      - name: snapshot_valid_from
+        description: >
+          Start timestamp of the matching snapshot-derived lifecycle period.
+
+      - name: snapshot_valid_to
+        description: >
+          End timestamp of the matching snapshot-derived lifecycle period.
+
+      - name: starting_status_version_id
+        description: >
+          SCD2 snapshot version that initiated the matching snapshot lifecycle
+          period.
+
+      - name: coverage_status
+        description: >
+          Classification describing how completely the native lifecycle period
+          is represented in snapshot-derived lifecycle history.
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values:
+                  - OBSERVED_WITHIN_SNAPSHOT_WINDOW
+                  - PARTIALLY_OBSERVED_WITHIN_SNAPSHOT_WINDOW
+                  - MISSED_WITHIN_SNAPSHOT_WINDOW
+                  - BEFORE_SNAPSHOT_OBSERVATION

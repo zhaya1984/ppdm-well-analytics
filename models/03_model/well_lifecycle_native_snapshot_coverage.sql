@@ -111,26 +111,22 @@ select
 
     case
 
-        -- Native period finished before snapshot observation existed
-        when native_expiry_date is not null
-         and native_expiry_date::timestamp <= first_snapshot_observed_at
-            then 'BEFORE_SNAPSHOT_OBSERVATION'
+    when native_expiry_date is not null
+     and native_expiry_date::timestamp <= first_snapshot_observed_at
+        then 'BEFORE_SNAPSHOT_OBSERVATION'
 
-        -- Native period was observable, but no matching snapshot lifecycle exists
-        when snapshot_lifecycle is null
-            then 'MISSED_NATIVE_PERIOD'
+    when snapshot_lifecycle is null
+        then 'MISSED_WITHIN_SNAPSHOT_WINDOW'
 
-        -- Matching snapshot lifecycle covers the entire observable native period
-        when snapshot_valid_from <= observable_from
-         and coalesce(
-                snapshot_valid_to,
-                '9999-12-31'::timestamp
-             ) >= observable_to
-            then 'OBSERVED'
+    when snapshot_valid_from <= observable_from
+     and coalesce(
+            snapshot_valid_to,
+            '9999-12-31'::timestamp
+         ) >= observable_to
+        then 'OBSERVED_WITHIN_SNAPSHOT_WINDOW'
 
-        -- Lifecycle was eventually observed, but not for the full observable period
-        else 'PARTIALLY_OBSERVED'
+    else 'PARTIALLY_OBSERVED_WITHIN_SNAPSHOT_WINDOW'
 
-    end as coverage_status
+end as coverage_status
 
 from classified
