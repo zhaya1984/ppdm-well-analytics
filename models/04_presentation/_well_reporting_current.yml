@@ -2,6 +2,9 @@ version: 2
 
 models:
   - name: well_reporting_current
+    config:
+      group: analytics_reporting
+
     description: >
       Current-state reporting dataset containing one row per well.
       It combines stable well attributes from dim_well with the latest
