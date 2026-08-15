@@ -1,17 +1,49 @@
 version: 2
 
 sources:
+
   - name: ppdm
     database: PPDM_SOURCE
     schema: RAW
 
     tables:
+
       - name: well
         identifier: WELL
+        description: >
+          Current PPDM well master source.
+          Each row represents one well identified by UWI.
+
+        columns:
+          - name: uwi
+            description: Unique business identifier of the well.
+            tests:
+              - not_null
+              - unique
 
       - name: well_status
         identifier: WELL_STATUS
- 
+        description: >
+          Mutable current-state well status source used as the input
+          to the dbt snapshot. Each row represents one current status
+          record per well.
+
+        columns:
+          - name: uwi
+            description: >
+              Identifier of the well associated with the current status record.
+              The source is expected to contain one current record per well.
+            tests:
+              - not_null
+              - unique
+
+          - name: last_updated_at
+            description: >
+              Source update timestamp used by the snapshot timestamp strategy
+              to detect changes to the current well status.
+            tests:
+              - not_null
+
       - name: well_status_native
         description: >
           Source-native PPDM-style well status history.
@@ -19,6 +51,7 @@ sources:
           source and effective period.
 
         columns:
+
           - name: status_id
             description: Source-native identifier of the status record.
             tests:
@@ -44,4 +77,3 @@ sources:
             description: Business date from which the status became effective.
             tests:
               - not_null
-
