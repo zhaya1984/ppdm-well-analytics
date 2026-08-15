@@ -1,0 +1,94 @@
+version: 2
+
+models:
+  - name: well_lifecycle_native_snapshot_fidelity
+    description: >
+      Evaluates the reconstruction fidelity of each source-native lifecycle
+      period against snapshot-derived lifecycle history. Each row represents
+      one source-native lifecycle period for a well and extends the upstream
+      coverage assessment by checking whether the snapshot-derived period
+      reproduces the native start and end boundaries exactly.
+
+    columns:
+      - name: native_status_id
+        description: >
+          Unique identifier of the source-native lifecycle period.
+        tests:
+          - not_null
+          - unique
+
+      - name: well_id
+        description: >
+          Identifier of the well associated with the native lifecycle period.
+
+      - name: native_lifecycle
+        description: >
+          Lifecycle value recorded in the source-native history.
+
+      - name: native_effective_date
+        description: >
+          Business-effective start date of the native lifecycle period.
+
+      - name: native_expiry_date
+        description: >
+          Business-effective end date of the native lifecycle period.
+          A null value represents an open-ended period.
+
+      - name: native_active_ind
+        description: >
+          Source-system indicator showing whether the native lifecycle
+          record is currently active.
+
+      - name: first_snapshot_observed_at
+        description: >
+          Earliest timestamp at which snapshot-derived lifecycle history
+          exists for the well.
+
+      - name: snapshot_lifecycle
+        description: >
+          Snapshot-derived lifecycle value matched to the native period,
+          where available.
+
+      - name: snapshot_valid_from
+        description: >
+          Start timestamp of the matching snapshot-derived lifecycle period.
+
+      - name: snapshot_valid_to
+        description: >
+          End timestamp of the matching snapshot-derived lifecycle period.
+
+      - name: starting_status_version_id
+        description: >
+          SCD2 snapshot version that initiated the matching snapshot
+          lifecycle period.
+
+      - name: observation_coverage_status
+        description: >
+          Upstream classification describing whether the native lifecycle
+          period falls within and is represented by the available snapshot
+          observation window.
+
+      - name: start_boundary_matches
+        description: >
+          Indicates whether the snapshot-derived lifecycle period begins on
+          the same date as the source-native lifecycle period.
+
+      - name: end_boundary_matches
+        description: >
+          Indicates whether the snapshot-derived lifecycle period ends on
+          the same date as the source-native lifecycle period, treating null
+          expiry dates as open-ended periods.
+
+      - name: reconstruction_status
+        description: >
+          Classification describing how faithfully the snapshot-derived
+          lifecycle period reconstructs the source-native lifecycle period.
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values:
+                  - BEFORE_SNAPSHOT_OBSERVATION
+                  - MISSED_NATIVE_PERIOD
+                  - FULLY_RECONSTRUCTED
+                  - PARTIALLY_RECONSTRUCTED
