@@ -4,6 +4,8 @@ An independent analytics engineering prototype built with Snowflake and dbt Fusi
 
 The project explores how current-state well reporting, historical status tracking, change detection, data quality, and BI consumption can be moved into a governed analytics engineering workflow while preparing for an anticipated evolution of the upstream status schema.
 
+I designed and implemented the dbt modelling architecture, historical reconstruction and reconciliation logic, data-quality controls, CI/CD workflow, and Power BI consumption interface demonstrated in this repository.
+
 ## Highlights
 
 - Designed a stable **one-row-per-well** analytical interface for Power BI while separating relatively stable well attributes from mutable status.
@@ -11,7 +13,7 @@ The project explores how current-state well reporting, historical status trackin
 - Modelled **source-native effective-dated history** separately from snapshot-observed history to preserve distinct business-time and observation-time semantics.
 - Built **coverage and fidelity reconciliation** to identify lifecycle periods that snapshots missed or only partially reconstructed.
 - Derived **field-level change events** from consecutive SCD2 versions using null-safe comparisons and incremental processing.
-- Implemented **source contracts, temporal-integrity tests, PR-triggered CI, and production orchestration** as part of the end-to-end workflow.
+- Implemented **source-grain validation, temporal-integrity tests, PR-triggered CI, and production orchestration** as part of the end-to-end workflow.
 
 ---
 
@@ -104,7 +106,7 @@ Dependencies move downstream through the architecture. Consumer-facing models do
 
 ### Layer Responsibilities
 
-**00_source — Source definitions and contracts**
+**00_source — Source definitions and assumptions**
 
 Defines the PPDM source boundary and documents critical assumptions about source grain, identifiers, and required fields.
 
@@ -133,7 +135,7 @@ Report-specific calculations remain downstream when they do not represent reusab
 ```text
 models/
 ├── 00_source/
-│   └── Source definitions and source contracts
+│   └── Source definitions and source-level validation
 │
 ├── 01_stage/
 │   └── Source-aligned staging models
@@ -371,7 +373,7 @@ This is treated as an operational design decision rather than assuming increment
 
 ---
 
-## Data Quality and Source Contracts
+## Data Quality and Source Assumptions
 
 Testing focuses on business assumptions, grain, and temporal integrity rather than on maximising test count.
 
@@ -389,13 +391,17 @@ Examples include:
 - current-state reconciliation,
 - and compound uniqueness of field-level change events.
 
-Source-level tests are especially important because several downstream designs depend on upstream grain.
+Critical source assumptions are documented and validated through source-level tests so that upstream changes fail visibly before propagating downstream.
 
-For example, the current `WELL_STATUS` source contract assumes **one mutable current record per well**.
+For example, the current `WELL_STATUS` source-grain assumption is:
 
-That assumption supports the current UWI-keyed snapshot design.
+> **one mutable current record per well**
 
-If the source evolves to multiple effective-dated records per well, the source-grain test should fail before that change silently propagates into historical and reporting models.
+This assumption supports the current UWI-keyed snapshot design.
+
+If the source evolves to multiple effective-dated records per well, the UWI uniqueness test should fail, signalling that the downstream snapshot, historical, current-state, and reporting assumptions must be reassessed.
+
+This use of documentation and source-level tests should not be confused with dbt's enforced model-contract feature; the objective here is to make critical upstream modelling assumptions explicit and testable.
 
 ---
 
@@ -528,7 +534,7 @@ the existing assumptions should not simply be carried forward.
 
 The migration would require reassessing:
 
-- source grain and source contracts,
+- source grain and source-level validation,
 - the snapshot business key,
 - current-state resolution,
 - business-effective history,
@@ -592,7 +598,7 @@ This project demonstrates the ability to:
 - distinguish **business-effective time** from **system-observation time**,
 - reconstruct SCD2 history and derive field-level change events,
 - evaluate snapshot history using source-native **coverage and fidelity reconciliation**,
-- protect modelling assumptions through source contracts and temporal-integrity tests,
+- protect critical upstream assumptions through documentation, source-level validation, and temporal-integrity tests,
 - and operationalise analytical models through **Git-based CI/CD, dbt Cloud orchestration, and Power BI consumption**.
 
-The central design goal is not simply to transform data, but to make **grain, history, business meaning, data quality, and downstream contracts explicit and testable**.
+The central design goal is not simply to transform data, but to make **grain, history, business meaning, data quality, and downstream interfaces explicit and testable**.
