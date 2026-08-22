@@ -602,3 +602,5 @@ This project demonstrates the ability to:
 - and operationalise analytical models through **Git-based CI/CD, dbt Cloud orchestration, and Power BI consumption**.
 
 The central design goal is not simply to transform data, but to make **grain, history, business meaning, data quality, and downstream interfaces explicit and testable**.
+
+Git Practice on 22 Aug.
